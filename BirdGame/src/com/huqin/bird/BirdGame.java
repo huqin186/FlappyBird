@@ -25,7 +25,6 @@ public class BirdGame extends JPanel{
 	Ground ground;
 	BufferedImage background;
 	//
-	//boolean gameOver;
 	int state;
 	public static final int START = 0;
 	public static final int RUNNING = 1;
@@ -66,8 +65,10 @@ public class BirdGame extends JPanel{
 	
 	public void paint(Graphics g){
 		g.drawImage(background, 0, 0, null);
-		g.drawImage(column1.image, column1.x - column1.width/2, column1.y - column1.height/2, null);
-		g.drawImage(column2.image, column2.x - column2.width/2, column2.y - column2.height/2, null);
+		g.drawImage(column1.imageDown, column1.x - column1.width/2, column1.y - column1.height/2, null);
+		g.drawImage(column1.imageUp, column1.x - column1.width/2, column1.y + column1.height/2 + column1.gap, null);
+		g.drawImage(column2.imageDown, column2.x - column2.width/2, column2.y - column2.height/2, null);
+		g.drawImage(column2.imageUp, column2.x - column2.width/2, column2.y + column2.height/2 + column1.gap, null);
 		g.drawImage(ground.image, ground.x, ground.y, null);
 		Graphics2D g2 = (Graphics2D) g;
 		g2.rotate(-bird.alpha, bird.x, bird.y);
@@ -81,16 +82,12 @@ public class BirdGame extends JPanel{
 		g.setColor(Color.WHITE);
 		g.drawString("" + score, 40 - 3, 60 - 3);
 		
-//		if (gameOver) {
-//			g.drawImage(gameOverImage, 0, 0, null);
-//		}
-		//
 		switch (state) {
 		case GAME_OVER:
-			g.drawImage(gameOverImage, 0, 0, null);
+			g.drawImage(gameOverImage, 82, 310, null);
 			break;
 		case START:
-			g.drawImage(startImage, 0, 0, null);
+			g.drawImage(startImage, 82, 310, null);
 			break;
 		}
 	}
@@ -145,7 +142,7 @@ public class BirdGame extends JPanel{
 				break;
 			}
 			repaint();
-			Thread.sleep(1000 / 30);
+			Thread.sleep(1000 / 60);
 		}
 	}
 	
@@ -180,7 +177,8 @@ class Ground {
  * 柱子
  */
 class Column {
-	BufferedImage image;
+	BufferedImage imageUp;
+	BufferedImage imageDown;
 	int x, y;
 	int width, height;
 	int gap; //上下柱子之间缝隙
@@ -188,20 +186,21 @@ class Column {
 	
 	Random random = new Random();
 	public Column(int n) throws Exception {
-		image = ImageIO.read(getClass().getResource("/img/tube.jpg"));
-		width = image.getWidth();
-		height = image.getHeight();
+		imageUp = ImageIO.read(getClass().getResource("/img/pipe_up.jpg"));
+		imageDown = ImageIO.read(getClass().getResource("/img/pipe_down.jpg"));
+		width = imageUp.getWidth();
+		height = imageUp.getHeight();
 		gap = 144;
 		distance = 245;
 		x = 550 + (n - 1) * distance;
-		y = random.nextInt(218) + 132;
+		y = random.nextInt(218) - 132;
 	}
 	//柱子移动
 	public void step() {
 		x--;
 		if (x == -width / 2) {
-			x = distance * 2 -width / 2;
-			y = random.nextInt(218) + 132;
+			x = distance * 2 - width / 2;
+			y = random.nextInt(218) - 132;
 		}
 	}
 }
@@ -212,7 +211,7 @@ class Bird {
 	BufferedImage image;
 	int x, y;
 	int width, height;
-	int size; 
+	int size;
 	//用于计算鸟的位置
 	double g; //重力加速度
 	double t; //两次位置时间间隔
@@ -273,7 +272,7 @@ class Bird {
 			y = ground.y - size / 2;
 			alpha = -3.14159265358979323 / 2;
 		}
-		return hit;
+		return false;
 	}
 	
 	public boolean hit(Column column) {
@@ -285,7 +284,8 @@ class Bird {
 					&& y < column.y + column.gap / 2 - size / 2) {
 				return false;
 			}
-			return true;
+			System.out.println(y +">"+ (column.y + size / 2)+" &&"+ y +"<"+ (column.y + size / 2 + column.gap));
+			return false;
 		}
 		return false;
 	}
