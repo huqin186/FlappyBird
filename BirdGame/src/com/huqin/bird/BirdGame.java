@@ -71,9 +71,9 @@ public class BirdGame extends JPanel{
 		g.drawImage(column2.imageUp, column2.x - column2.width/2, column2.y + column2.height/2 + column1.gap, null);
 		g.drawImage(ground.image, ground.x, ground.y, null);
 		Graphics2D g2 = (Graphics2D) g;
-		g2.rotate(-bird.alpha, bird.x, bird.y);
+		//g2.rotate(-bird.alpha, bird.x, bird.y);
 		g.drawImage(bird.image, bird.x - bird.width/2, bird.y - bird.height/2, null);
-		g2.rotate(bird.alpha, bird.x, bird.y);
+		//g2.rotate(bird.alpha, bird.x, bird.y);
 		
 		//在 paint 方法中添加绘制分数的算法
 		Font f =  new Font(Font.SANS_SERIF, Font.BOLD, 40);
@@ -118,7 +118,7 @@ public class BirdGame extends JPanel{
 		};
 		addMouseListener(l);
 		//
-		while (true) {			
+		while (true) {
 			switch (state) {
 			case GAME_OVER:
 			case START:
@@ -272,7 +272,7 @@ class Bird {
 			y = ground.y - size / 2;
 			alpha = -3.14159265358979323 / 2;
 		}
-		return false;
+		return hit;
 	}
 	
 	public boolean hit(Column column) {
@@ -280,12 +280,11 @@ class Bird {
 		if (x > column.x - column.width / 2 - size /2 
 				&& x < column.x + column.width / 2 + size / 2) {
 			//检测是否在缝隙中
-			if (y > column.y - column.gap / 2 + size / 2
-					&& y < column.y + column.gap / 2 - size / 2) {
+			if (y > column.y + column.height/2 + size/2
+					&& y < column.y + column.height/2 - size/2 + column.gap) {
 				return false;
 			}
-			System.out.println(y +">"+ (column.y + size / 2)+" &&"+ y +"<"+ (column.y + size / 2 + column.gap));
-			return false;
+			return true;
 		}
 		return false;
 	}
